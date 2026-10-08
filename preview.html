@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Historia Quest — Thema 2</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#0f172a;color:#f8fafc}
+button{font:inherit;cursor:pointer}.app{max-width:1100px;margin:auto;padding:24px}
+header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px}
+.logo{font-size:26px;font-weight:900}.logo span{color:#fbbf24}.stats{display:flex;gap:10px;flex-wrap:wrap}.pill{background:#1e293b;border:1px solid #334155;border-radius:999px;padding:9px 14px;font-weight:700}
+.hero{background:linear-gradient(135deg,#312e81,#7c3aed);border-radius:28px;padding:34px;margin-bottom:22px;box-shadow:0 18px 50px #0005}
+.hero h1{font-size:42px;margin:0 0 8px}.hero p{color:#ddd6fe;font-size:17px}
+.progress{height:10px;background:#ffffff22;border-radius:10px;overflow:hidden;margin-top:20px}.progress i{display:block;height:100%;background:#fbbf24;width:0}
+.screen{display:none}.screen.active{display:block}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.card{background:#1e293b;border:1px solid #334155;border-radius:20px;padding:20px;transition:.15s}.card:hover{transform:translateY(-3px);border-color:#8b5cf6}
+.card h3{margin:8px 0}.emoji{font-size:38px}.muted{color:#94a3b8}.small{font-size:14px}
+.primary{background:#fbbf24;color:#111827;border:0;border-radius:12px;padding:11px 16px;font-weight:900}.secondary{background:#334155;color:#fff;border:0;border-radius:12px;padding:11px 16px;font-weight:800}
+.question{font-size:25px;font-weight:800;line-height:1.3}.answers{display:grid;gap:10px;margin-top:20px}.answer{background:#334155;color:#fff;border:1px solid #475569;border-radius:14px;padding:14px;text-align:left}.answer:hover{background:#475569}.correct{background:#166534!important}.wrong{background:#991b1b!important}
+.top{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:18px}.tag{color:#c4b5fd;font-weight:800}
+.feedback{min-height:32px;margin-top:14px;font-weight:800}.back{margin-bottom:15px}
+.timeline{display:grid;gap:12px}.event{display:flex;gap:16px;background:#1e293b;padding:15px;border-radius:15px;border-left:5px solid #8b5cf6}
+.term{font-weight:900;color:#fbbf24;min-width:135px}
+.badge{font-size:42px}.hidden{display:none!important}
+footer{margin:30px 0 10px;color:#64748b;text-align:center}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="logo">⚔️ Historia <span>Quest</span></div>
+  <div class="stats"><div class="pill">⭐ <span id="xp">0</span> XP</div><div class="pill">🏆 Level <span id="level">1</span></div></div>
+</header>
+
+<section id="home" class="screen active">
+  <div class="hero">
+    <h1>De val van het West-Romeinse Rijk</h1>
+    <p>Leer Thema 2 door te spelen. Verdien XP, speel spellen en word meester van de Romeinse geschiedenis.</p>
+    <div class="progress"><i id="bar"></i></div>
+    <p class="small" id="progressText">0% van je leeravontuur voltooid</p>
+  </div>
+  <div class="grid">
+    <div class="card"><div class="emoji">⚡</div><h3>Quiz Battle</h3><p class="muted">Beantwoord vragen over de cursus en verdien XP.</p><button class="primary" onclick="startQuiz()">Spelen</button></div>
+    <div class="card"><div class="emoji">🕰️</div><h3>Tijdlijn Race</h3><p class="muted">Zet belangrijke gebeurtenissen in de juiste volgorde.</p><button class="primary" onclick="timeline()">Spelen</button></div>
+    <div class="card"><div class="emoji">🧠</div><h3>Begrippen Battle</h3><p class="muted">Test of je de belangrijkste begrippen kent.</p><button class="primary" onclick="terms()">Spelen</button></div>
+    <div class="card"><div class="emoji">🔎</div><h3>Historische Detective</h3><p class="muted">Ontdek waardoor het West-Romeinse Rijk viel.</p><button class="primary" onclick="detective()">Spelen</button></div>
+    <div class="card"><div class="emoji">📚</div><h3>Snelle Samenvatting</h3><p class="muted">Bekijk de kern van elk onderdeel.</p><button class="primary" onclick="summary()">Openen</button></div>
+    <div class="card"><div class="emoji">🏆</div><h3>Eindbaas</h3><p class="muted">Een gemengde challenge over de hele cursus.</p><button class="primary" onclick="boss()">Start</button></div>
+  </div>
+</section>
+
+<section id="game" class="screen">
+<div class="top"><button class="secondary back" onclick="home()">← Menu</button><span class="tag" id="gameTag"></span></div>
+<div class="card">
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
+<button class="secondary levelBtn" onclick="setLevel('easy')">🟢 Makkelijk</button>
+<button class="secondary levelBtn" onclick="setLevel('normal')">🟡 Normaal</button>
+<button class="secondary levelBtn" onclick="setLevel('hard')">🟠 Moeilijk</button>
+<button class="secondary levelBtn" onclick="setLevel('expert')">🔴 Expert</button>
+</div>
+<div class="small muted" id="levelInfo">Normaal: gewone vragen</div>
+<div class="question" id="question"></div><div class="answers" id="answers"></div><div class="feedback" id="feedback"></div><button class="primary hidden" id="next" onclick="nextQ()">Volgende →</button></div>
+</section>
+
+<section id="timeline" class="screen">
+<div class="top"><button class="secondary" onclick="home()">← Menu</button><span class="tag">Tijdlijn Race</span></div>
+<div class="card"><h2>Zet de gebeurtenissen in de juiste volgorde</h2><p class="muted">Klik op de gebeurtenissen van oud naar nieuw.</p><div id="tl"></div><button class="primary" onclick="checkTimeline()">Controleer</button><div class="feedback" id="tlFeedback"></div></div>
+</section>
+
+<section id="summary" class="screen">
+<div class="top"><button class="secondary" onclick="home()">← Menu</button><span class="tag">Cursusoverzicht</span></div>
+<div class="grid" id="sum"></div>
+</section>
+
+<footer>Gebaseerd op jouw cursus: Thema 2 — De val van het West-Romeinse Rijk</footer>
+</div>
+
+<script>
+const quizLevels={
+easy:[
+["Welke drie grote perioden kent de Romeinse geschiedenis?","Koningstijd, Republiek en Keizertijd",["Middeleeuwen, Republiek en Keizertijd","Koningstijd, Republiek en Keizertijd","Keizertijd, Renaissance en Republiek","Koningstijd, Feodalisme en Republiek"]],
+["Wie was de eerste Romeinse keizer?","Augustus",["Nero","Augustus","Trajanus","Odoaker"]],
+["Wie zette Romulus Augustulus af?","Odoaker",["Attila","Julius Caesar","Odoaker","Augustus"]],
+["In welk jaar viel het West-Romeinse Rijk?","476",["395","44 v.Chr.","27 v.Chr.","476"]]
+],
+normal:[
+["In welk jaar werd Julius Caesar vermoord?","44 v.Chr.",["27 v.Chr.","476 na Chr.","44 v.Chr.","509 v.Chr."]],
+["Waarom werd het Romeinse Rijk opgesplitst?","Het rijk was te groot om nog gemakkelijk als één geheel te besturen.",["Er was geen leger meer","Het rijk was te groot om nog gemakkelijk als één geheel te besturen.","De Germanen hadden Rome al veroverd","Caesar wilde twee senaten"]],
+["Wat was een belangrijke economische oorzaak van de crisis?","Oorlogen zorgden voor financiële problemen, hogere prijzen en belastingen.",["Er waren te veel havens","Oorlogen zorgden voor financiële problemen, hogere prijzen en belastingen.","De Germanen stopten alle handel","De senaat schafte belastingen af"]],
+["Wat betekent foederati?","Germaanse groepen die in het Romeinse leger werden ingezet.",["Romeinse senatoren","Germaanse groepen die in het Romeinse leger werden ingezet.","Hunnen in de keizerlijke garde","Romeinse slaven"]],
+["Wat was de Grote Volksverhuizing?","De massale vestiging van Germaanse volkeren binnen het Romeinse Rijk.",["De uitbreiding van Rome naar Afrika","De massale vestiging van Germaanse volkeren binnen het Romeinse Rijk.","De verhuizing van Rome naar Ravenna","De reis van Caesar naar Gallia"]]
+],
+hard:[
+["Welke combinatie bevat uitsluitend interne oorzaken van de val van het West-Romeinse Rijk?","Politieke chaos, economische problemen en de enorme omvang van het rijk.",["De Hunnen, Odoaker en de Germanen","Politieke chaos, economische problemen en de enorme omvang van het rijk.","De Grote Volksverhuizing, foederati en Attila","De Perzen, Arabieren en Germanen"]],
+["Waarom trokken veel Germanen vanaf het einde van de 4de eeuw het Romeinse Rijk binnen?","De Hunnen verdreven hen en ze zochten voedsel en bescherming.",["Ze wilden Romeinse keizers worden","De Hunnen verdreven hen en ze zochten voedsel en bescherming.","Caesar nodigde alle stammen uit","Ze wilden de Romeinse senaat afschaffen"]],
+["Wat is het verband tussen de Hunnen en de Grote Volksverhuizing?","De Hunnen zetten Germaanse stammen onder druk, waardoor die naar het Romeinse Rijk trokken.",["De Hunnen bestuurden Rome","De Hunnen zetten Germaanse stammen onder druk, waardoor die naar het Romeinse Rijk trokken.","De Germanen verdreven de Hunnen uit Rome","Er is geen verband"]],
+["Wat gebeurde in 395?","Het Romeinse Rijk werd definitief opgesplitst in een West- en Oost-Romeins Rijk.",["Caesar werd vermoord","Augustus werd keizer","Het Romeinse Rijk werd definitief opgesplitst in een West- en Oost-Romeins Rijk.","Odoaker werd koning van Italië"]]
+],
+expert:[
+["Welke redenering verklaart het best waarom de val van het West-Romeinse Rijk niet door één oorzaak kan worden verklaard?","Interne verzwakking maakte het rijk kwetsbaar, terwijl externe druk en Germaanse vestiging de problemen versterkten.",["Alleen de Hunnen waren verantwoordelijk","Interne verzwakking maakte het rijk kwetsbaar, terwijl externe druk en Germaanse vestiging de problemen versterkten.","Rome werd plots door één veldslag vernietigd","De economische crisis begon pas na 476"]],
+["Welke uitspraak past het best bij de standplaatsgebondenheid in de cursus?","Romeinse bronnen beschreven de Germanen vanuit het perspectief van een rijk dat hen als bedreiging zag.",["Alle Romeinse bronnen zijn volledig objectief","Romeinse bronnen beschreven de Germanen vanuit het perspectief van een rijk dat hen als bedreiging zag.","De Germanen schreven alle Romeinse geschiedenis","Standplaatsgebondenheid betekent dat bronnen geen waarde hebben"]],
+["Welke volgorde is volledig correct?","Republiek → Caesar vermoord → Augustus → opsplitsing in 395 → afzetting van Romulus Augustulus in 476",["Augustus → Republiek → Caesar vermoord → 476 → 395","Republiek → Caesar vermoord → Augustus → opsplitsing in 395 → afzetting van Romulus Augustulus in 476","Koningstijd → Augustus → Caesar vermoord → Republiek → 476","Republiek → 395 → Caesar vermoord → Augustus → 476"]],
+["Welke uitspraak maakt het beste onderscheid tussen de val van het West-Romeinse Rijk en het einde van het Romeinse Rijk als geheel?","476 betekende het einde van het West-Romeinse Rijk, terwijl het Oost-Romeinse Rijk nog eeuwen bleef bestaan.",["In 476 eindigden beide rijken","476 betekende het einde van het West-Romeinse Rijk, terwijl het Oost-Romeinse Rijk nog eeuwen bleef bestaan.","Het West-Romeinse Rijk bleef bestaan en het Oost-Romeinse Rijk viel","Het Oost-Romeinse Rijk bestond alleen vóór 395"]]
+]};
+let level='normal';
+let quiz=quizLevels[level];
+let qi=0,score=0,active=quiz;
+function show(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active')}
+function home(){show('home')}
+function addXP(n){score+=n;document.getElementById('xp').textContent=score;let lvl=Math.floor(score/100)+1;document.getElementById('level').textContent=lvl;document.getElementById('bar').style.width=Math.min(score/5,100)+'%';document.getElementById('progressText').textContent=Math.min(Math.round(score/5),100)+'% van je leeravontuur voltooid'}
+function setLevel(l){
+  level=l;
+  quiz=quizLevels[level];
+  const names={easy:"Makkelijk",normal:"Normaal",hard:"Moeilijk",expert:"Expert"};
+  const xp={easy:10,normal:20,hard:30,expert:50};
+  document.getElementById('levelInfo').textContent=names[l]+": "+(l==='easy'?"basisvragen en duidelijke antwoorden":l==='normal'?"gewone vragen":l==='hard'?"meer verbanden en moeilijkere afleiders":"complexe redeneervragen")+". +"+xp[l]+" XP per juist antwoord.";
+  if(document.getElementById('game').classList.contains('active')){qi=0;renderQ();}
+}
+function startQuiz(){active=quiz;qi=0;document.getElementById('gameTag').textContent='Quiz Battle';show('game');setLevel(level);renderQ()}
+function renderQ(){let q=active[qi];document.getElementById('question').textContent=q[0];document.getElementById('feedback').textContent='';document.getElementById('next').classList.add('hidden');let a=document.getElementById('answers');a.innerHTML='';q[2].forEach(x=>{let b=document.createElement('button');b.className='answer';b.textContent=x;b.onclick=()=>answer(b,x===q[1]);a.appendChild(b)})}
+function answer(btn,ok){document.querySelectorAll('.answer').forEach(b=>b.disabled=true);if(ok){btn.classList.add('correct');const gained={easy:10,normal:20,hard:30,expert:50}[level];document.getElementById('feedback').textContent='✅ Juist! +'+gained+' XP';addXP(gained)}else{btn.classList.add('wrong');document.getElementById('feedback').textContent='❌ Niet juist. Het juiste antwoord is: '+active[qi][1]}document.getElementById('next').classList.remove('hidden')}
+function nextQ(){qi++;if(qi>=active.length){document.getElementById('question').textContent='🏆 Spel voltooid!';document.getElementById('answers').innerHTML='';document.getElementById('feedback').textContent='Je verdiende '+(active.length*20)+' XP als alles juist was. Speel nog een spel!';document.getElementById('next').classList.add('hidden')}else renderQ()}
+const events=[["Rome wordt volgens de overlevering gesticht","753 v.Chr."],["Begin van de Republiek","509 v.Chr."],["Julius Caesar wordt vermoord","44 v.Chr."],["Augustus wordt princeps","27 v.Chr."],["Opsplitsing West- en Oost-Romeinse Rijk","395"],["Romulus Augustulus wordt afgezet","476"]];
+let order=[];
+function timeline(){show('timeline');order=[];let shuffled=[...events].sort(()=>Math.random()-.5);let box=document.getElementById('tl');box.innerHTML='';shuffled.forEach((e,i)=>{let b=document.createElement('button');b.className='answer';b.textContent=e[0];b.onclick=()=>{if(!order.includes(i)){order.push(i);b.style.opacity='.45';b.textContent=(order.length)+'. '+e[0]}};box.appendChild(b)})}
+function checkTimeline(){let current=[...document.querySelectorAll('#tl .answer')].filter(b=>b.style.opacity).map(b=>b.textContent.replace(/^\d+\.\s/,'')).map(t=>events.findIndex(e=>e[0]===t));let correct=[...events.keys()];let fb=document.getElementById('tlFeedback');if(JSON.stringify(current)===JSON.stringify(correct)){fb.textContent='🏆 Perfect! +100 XP';addXP(100)}else fb.textContent='Nog niet juist. Denk aan de jaartallen: 753 v.Chr. → 509 v.Chr. → 44 v.Chr. → 27 v.Chr. → 395 → 476.'}
+const termsData=[["Soldatenkeizer","Een generaal die door zijn leger tot keizer werd uitgeroepen."],["Senaat","Een machtig politiek orgaan tijdens de Republiek."],["Foederati","Germaanse groepen die in het Romeinse leger werden ingezet."],["Odoaker","De Germaanse leider die Romulus Augustulus afzette."],["Grote Volksverhuizing","De massale vestiging van Germaanse volkeren binnen het Romeinse Rijk."],["Mythologie vs. werkelijkheid","Het verschil tussen verhalen en wat historische bronnen ondersteunen."]];
+function terms(){active=termsData.map(t=>[t[0],"WAAR",["WAAR","NIET WAAR"]]);qi=0;document.getElementById('gameTag').textContent='Begrippen Battle';show('game');renderTerm()}
+function renderTerm(){let t=termsData[qi];document.getElementById('question').textContent='Wat hoort bij: '+t[0]+'?';document.getElementById('answers').innerHTML='';[t[1],"Een Romeinse god uit de Keizertijd","Een soort Romeins schip","De naam van een Romeinse provincie"].forEach((x,i)=>{let b=document.createElement('button');b.className='answer';b.textContent=x;b.onclick=()=>{document.querySelectorAll('.answer').forEach(z=>z.disabled=true);if(i===0){b.classList.add('correct');addXP(20);document.getElementById('feedback').textContent='✅ Juist! +20 XP'}else{b.classList.add('wrong');document.getElementById('feedback').textContent='❌ Het juiste antwoord was: '+t[1]}document.getElementById('next').classList.remove('hidden')};document.getElementById('answers').appendChild(b)})}
+function detective(){active=quizLevels[level].slice(0,Math.min(4,quizLevels[level].length));qi=0;document.getElementById('gameTag').textContent='Historische Detective';show('game');renderQ()}
+function boss(){active=[...quizLevels.expert,...quizLevels.hard,...quizLevels.normal].sort(()=>Math.random()-.5).slice(0,7);qi=0;document.getElementById('gameTag').textContent='🏆 Eindbaas';show('game');renderQ()}
+function summary(){show('summary');let data=[["🏛️ Drie perioden","Koningstijd (753–509 v.Chr.), Republiek (509–27 v.Chr.) en Keizertijd (27 v.Chr.–476 na Chr.)."],["⚔️ Republiek","Rome breidt sterk uit. Julius Caesar verovert Gallia en wordt uiteindelijk vermoord in 44 v.Chr."],["👑 Keizertijd","Octavianus wordt Augustus en is de eerste keizer."],["💥 Interne oorzaken","Politieke chaos, economische problemen en een rijk dat te groot werd om eenvoudig te besturen."],["🛡️ Germanen","Een verzameling volkeren en stammen zoals Franken, Longobarden, Saksen en Visigoten."],["🐎 Hunnen","De Hunnen zetten Germaanse stammen onder druk en drijven hen richting het Romeinse Rijk."],["🚶 Grote Volksverhuizing","Vanaf het einde van de 4de en begin van de 5de eeuw vestigen Germaanse volkeren zich massaal in het Romeinse Rijk."],["🏁 476","Odoaker zet Romulus Augustulus af. Dit betekent het definitieve einde van het West-Romeinse Rijk."]];document.getElementById('sum').innerHTML=data.map(x=>`<div class="card"><div class="emoji">${x[0].slice(0,2)}</div><h3>${x[0].slice(3)}</h3><p class="muted">${x[1]}</p></div>`).join('')}
+</script>
+</body>
+</html>
